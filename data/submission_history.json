@@ -1,0 +1,60 @@
+[
+    {
+        "submission_id": "a98d8a24-5765-4294-984c-a1b560827e9e",
+        "user_id": "student_01",
+        "question_id": "efeba3e16abfcf4c31fe1d19b6df19e3ad830476ae14589d52d6fd7775c55f29",
+        "submitted_ocr_text": "白日依山尽，长江入海流。",
+        "timestamp": "2025-07-12T15:04:31.105988"
+    },
+    {
+        "submission_id": "dab8334e-dfa9-4860-aa22-2d316741ba1b",
+        "user_id": "student_01",
+        "timestamp": "2025-07-12T10:32:00.782286",
+        "subject": "英语",
+        "image_path": "data/submissions/student_01/bcdb6a02db25.png",
+        "ocr_text": "my\nname\nare\nbob.",
+        "ai_analysis": {
+            "subject": "英语",
+            "is_correct": false,
+            "error_analysis": "语法错误。'are' 应该改为 'is'，因为主语 'name' 是单数。",
+            "correct_answer": "My name is Bob.",
+            "solution_steps": "1. 主语 'name' 是单数，所以谓语动词应该用 'is'。\n2. 首字母 'my' 和 'bob' 应该大写。\n3. 句尾应该加上句号。",
+            "knowledge_point": "主谓一致和基本句子结构",
+            "common_mistakes": "初学者可能会混淆 'is' 和 'are' 的使用，特别是在主语是单数或复数时。"
+        }
+    },
+    {
+        "submission_id": "1279711b-2d30-49ef-b5cd-6de0104ca906",
+        "user_id": "student_01",
+        "timestamp": "2025-07-12T10:31:33.322266",
+        "subject": "语文",
+        "image_path": "data/submissions/student_01/d55c937cdc41.png",
+        "ocr_text": "白日依山尽，长江入海流。",
+        "ai_analysis": {
+            "subject": "语文",
+            "is_correct": true,
+            "error_analysis": "",
+            "correct_answer": "",
+            "solution_steps": "",
+            "knowledge_point": "古诗词背诵与理解",
+            "common_mistakes": "在背诵古诗词时，可能会因为记忆不准确或对诗句理解不深而出错。"
+        }
+    },
+    {
+        "submission_id": "8212a29a-de55-45de-85c2-399e61cd7c34",
+        "user_id": "student_01",
+        "timestamp": "2025-07-12T09:51:59.019933",
+        "subject": "数学",
+        "image_path": "data/submissions/student_01/3f1c361e8f23.png",
+        "ocr_text": "1+1=3",
+        "ai_analysis": {
+            "subject": "数学",
+            "is_correct": false,
+            "error_analysis": "计算错误。1加1的结果应该是2，而不是3。",
+            "correct_answer": "1 + 1 = 2",
+            "solution_steps": "这是一个基础的加法运算。将1和1相加，得到结果2。",
+            "knowledge_point": "10以内的加法",
+            "common_mistakes": "在初学加法时，可能会因为数数不准或对加法概念理解不清而出错。"
+        }
+    }
+]

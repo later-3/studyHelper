@@ -1,0 +1,161 @@
+{
+  "school_name": "智慧未来实验小学",
+  "school_info": {
+    "id": "school_01",
+    "name": "智慧未来实验小学",
+    "address": "北京市朝阳区智慧路123号",
+    "phone": "010-12345678",
+    "created_at": "2025-01-01"
+  },
+  "grades": [
+    {
+      "id": "grade_05",
+      "name": "五年级",
+      "grade_level": 5,
+      "manager_id": "grade_manager_01",
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "grade_06", 
+      "name": "六年级",
+      "grade_level": 6,
+      "manager_id": "grade_manager_02",
+      "created_at": "2025-01-01"
+    }
+  ],
+  "classes": [
+    {
+      "id": "class_01",
+      "name": "五年级一班",
+      "grade_id": "grade_05",
+      "teacher_id": "teacher_01",
+      "student_count": 32,
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "class_02",
+      "name": "五年级二班", 
+      "grade_id": "grade_05",
+      "teacher_id": "teacher_02",
+      "student_count": 30,
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "class_03",
+      "name": "六年级一班",
+      "grade_id": "grade_06", 
+      "teacher_id": "teacher_03",
+      "student_count": 28,
+      "created_at": "2025-01-01"
+    }
+  ],
+  "users": [
+    {
+      "id": "principal_01",
+      "name": "王校长",
+      "role": "principal",
+      "school_id": "school_01",
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "grade_manager_01",
+      "name": "李主任",
+      "role": "grade_manager",
+      "grade_id": "grade_05",
+      "school_id": "school_01",
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "grade_manager_02",
+      "name": "张主任", 
+      "role": "grade_manager",
+      "grade_id": "grade_06",
+      "school_id": "school_01",
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "teacher_01",
+      "name": "张老师",
+      "role": "teacher",
+      "class_id": "class_01",
+      "grade_id": "grade_05",
+      "school_id": "school_01",
+      "manages_classes": ["class_01"],
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "teacher_02",
+      "name": "李老师",
+      "role": "teacher", 
+      "class_id": "class_02",
+      "grade_id": "grade_05",
+      "school_id": "school_01",
+      "manages_classes": ["class_02"],
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "teacher_03",
+      "name": "王老师",
+      "role": "teacher",
+      "class_id": "class_03", 
+      "grade_id": "grade_06",
+      "school_id": "school_01",
+      "manages_classes": ["class_03"],
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "student_01",
+      "name": "小明",
+      "role": "student",
+      "class_id": "class_01",
+      "grade_id": "grade_05",
+      "school_id": "school_01",
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "student_02", 
+      "name": "小红",
+      "role": "student",
+      "class_id": "class_01",
+      "grade_id": "grade_05",
+      "school_id": "school_01",
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "student_03",
+      "name": "小刚",
+      "role": "student", 
+      "class_id": "class_02",
+      "grade_id": "grade_05",
+      "school_id": "school_01",
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "student_04",
+      "name": "小丽",
+      "role": "student",
+      "class_id": "class_02",
+      "grade_id": "grade_05", 
+      "school_id": "school_01",
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "student_05",
+      "name": "小强",
+      "role": "student",
+      "class_id": "class_03",
+      "grade_id": "grade_06",
+      "school_id": "school_01",
+      "created_at": "2025-01-01"
+    },
+    {
+      "id": "student_06",
+      "name": "小美",
+      "role": "student",
+      "class_id": "class_03",
+      "grade_id": "grade_06",
+      "school_id": "school_01", 
+      "created_at": "2025-01-01"
+    }
+  ]
+}

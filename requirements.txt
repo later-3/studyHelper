@@ -1,0 +1,9 @@
+streamlit
+paddleocr>=2.7
+openai
+Pillow
+python-dotenv
+streamlit-option-menu
+streamlit-lottie
+streamlit-elements
+ImageHash

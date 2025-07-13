@@ -1,0 +1,21 @@
+{
+    "efeba3e16abfcf4c31fe1d19b6df19e3ad830476ae14589d52d6fd7775c55f29": {
+        "question_id": "efeba3e16abfcf4c31fe1d19b6df19e3ad830476ae14589d52d6fd7775c55f29",
+        "canonical_text": "白日依山尽，长江入海流。",
+        "first_submission_image": "data/submissions/student_01/ce89ad291ed3.png",
+        "subject": "语文",
+        "master_analysis": {
+            "subject": "语文",
+            "is_correct": true,
+            "error_analysis": "",
+            "correct_answer": "",
+            "solution_steps": "",
+            "knowledge_point": "古诗词背诵与理解",
+            "common_mistakes": "在背诵古诗词时，可能会因为记忆不准确而遗漏或错记诗句。"
+        },
+        "first_seen_timestamp": "2025-07-12T15:04:31.104672",
+        "known_p_hashes": [
+            "aa2bd5d43895363a"
+        ]
+    }
+}

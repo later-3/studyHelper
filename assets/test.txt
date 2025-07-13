@@ -1,0 +1,21 @@
+def extract_text_from_image(image_path):
+    print(f"\n{'='*20} 正在识别 {image_path} {'='*20}")
+    try:
+        img = Image.open(image_path)
+        print(f"图片尺寸: {img.size}")
+    except FileNotFoundError:
+        return [f"图片文件不存在: {image_path}"]
+
+    # 初始化 OCR 引擎，针对简单数学表达式优化参数
+    # 禁用文档预处理功能，避免不必要的旋转和变形
+    ocr = PaddleOCR(
+        lang='en',  # 使用英文模型，对数字和符号识别更好
+        use_doc_orientation_classify=False,  # 禁用文档方向分类
+        use_doc_unwarping=False,  # 禁用文档矫正
+        use_textline_orientation=False,  # 禁用文本行方向分类
+        text_det_limit_side_len=64,  # 设置检测限制
+        text_det_limit_type='min'  # 最小边限制
+    )
+
+    print("开始使用 PaddleOCR 进行识别...")
+
