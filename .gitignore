@@ -139,9 +139,19 @@ results/
 .streamlit/
 
 # Virtual environment
-studyhelper/
+# studyhelper/ # We might want to commit this if not using Docker
 
 # Temporary test files (moved to scripts/)
 # test_*.py
 # debug_*.py
 # cleanup_*.py 
+
+# Docker
+.dockerignore
+docker-compose.yml.override
+# Project-specific data and logs
+log.txt
+data/submissions/
+*.db
+*.sqlite3
+
