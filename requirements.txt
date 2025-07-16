@@ -1,9 +1,34 @@
-streamlit
+# Core ML/AI Libraries
+torch
+torchvision
+paddlepaddle
 paddleocr>=2.7
-openai
+paddlex
+sentence-transformers
+
+# Web & App Framework
+streamlit
+fastapi
+uvicorn
+
+# Data & Image Processing
 Pillow
+ImageHash
+plotly
+
+# OpenAI & LLM
+openai
+
+# Utility & Database
 python-dotenv
 streamlit-option-menu
 streamlit-lottie
 streamlit-elements
-ImageHash
+chromadb
+sqlalchemy
+psycopg2-binary
+PyJWT
+
+# Testing
+pytest
+pytest-cov

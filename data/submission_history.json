@@ -1,5 +1,40 @@
 [
     {
+        "submission_id": "17717126-4e88-4c80-97c1-610526c930c2",
+        "user_id": "student_01",
+        "question_id": "d66b955be288e70a1ecaf87eb61aa60995f02e321fe230c5cadbdda3e5ca861d",
+        "submitted_ocr_text": "1+1=3",
+        "timestamp": "2025-07-16T17:58:29.926177"
+    },
+    {
+        "submission_id": "ac4012c0-3165-4ead-9dc4-7be0998a3b4a",
+        "user_id": "student_01",
+        "question_id": "d66b955be288e70a1ecaf87eb61aa60995f02e321fe230c5cadbdda3e5ca861d",
+        "submitted_ocr_text": "1+1=3",
+        "timestamp": "2025-07-16T13:10:54.793479"
+    },
+    {
+        "submission_id": "d96fccc8-d225-434b-84cb-e6f3c4906cc3",
+        "user_id": "student_01",
+        "question_id": "d66b955be288e70a1ecaf87eb61aa60995f02e321fe230c5cadbdda3e5ca861d",
+        "submitted_ocr_text": "1+1=3",
+        "timestamp": "2025-07-16T12:57:05.689929"
+    },
+    {
+        "submission_id": "f7e3d471-2bb9-40dd-a027-5492a867e765",
+        "user_id": "student_01",
+        "question_id": "d66b955be288e70a1ecaf87eb61aa60995f02e321fe230c5cadbdda3e5ca861d",
+        "submitted_ocr_text": "1+1=3",
+        "timestamp": "2025-07-16T12:49:26.445667"
+    },
+    {
+        "submission_id": "bdc11546-92e5-4c26-af81-6a1a43d4604d",
+        "user_id": "student_01",
+        "question_id": "d66b955be288e70a1ecaf87eb61aa60995f02e321fe230c5cadbdda3e5ca861d",
+        "submitted_ocr_text": "1+1=3",
+        "timestamp": "2025-07-16T12:47:26.656504"
+    },
+    {
         "submission_id": "a98d8a24-5765-4294-984c-a1b560827e9e",
         "user_id": "student_01",
         "question_id": "efeba3e16abfcf4c31fe1d19b6df19e3ad830476ae14589d52d6fd7775c55f29",

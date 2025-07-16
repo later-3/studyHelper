@@ -45,10 +45,10 @@ def load_lottieurl(url: str):
 
 # --- 核心业务逻辑 (可被独立测试) ---
 def intelligent_search_logic(user: dict, image_path: str, force_new_analysis: bool = False):
-    logger.info(f"Starting intelligent_search_logic for user {user['id']}. Image path: {image_path}, Force new: {force_new_analysis}")
+    logger.info(f"xxxxxStarting intelligent_search_logic for user {user['id']}. Image path: {image_path}, Force new: {force_new_analysis}")
     
     # 首先进行OCR识别
-    logger.info("Starting OCR process...")
+    logger.info("1111Starting OCR process...")
     ocr_text_list = ocr_service.get_text_from_image(image_path)
     logger.info(f"OCR识别结果: {ocr_text_list}")
     ocr_text = '\n'.join(ocr_text_list)
@@ -59,7 +59,7 @@ def intelligent_search_logic(user: dict, image_path: str, force_new_analysis: bo
         logger.error(f"OCR failed for image: {image_path}, result: {ocr_text}")
         return None, "文字识别失败或图片为空，请确保图片清晰。", None, None
     
-    logger.info(f"OCR successful, text: {ocr_text[:100]}...")
+    logger.info(f"zzzzzOCR successful, text: {ocr_text[:100]}...")
     
     # 如果不是强制重新分析，尝试从缓存获取
     if not force_new_analysis:

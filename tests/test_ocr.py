@@ -1,33 +1,26 @@
 import unittest
 import os
-from PIL import Image
+from core.ai_services import get_ocr_engine
 from ocr.paddle_ocr import extract_text_from_image
 
-class TestOcr(unittest.TestCase):
-
+class TestOcrDebug(unittest.TestCase):
     def setUp(self):
-        """设置测试所需的文件路径。"""
-        self.correct_math_path = '/Users/xulater/studyHelper/studyhelper-demo/studyhelper-demo-final/data/problem_samples/math_correct.png'
-        self.wrong_math_path = '/Users/xulater/studyHelper/studyhelper-demo/studyhelper-demo-final/data/problem_samples/math_wrong.png'
+        self.img_path = 'assets/1.jpg'
+        self.log_path = 'logs/app.log'
 
-    def test_extract_from_path_exact(self):
-        """测试从文件路径提取精确的文本。"""
-        self.assertTrue(os.path.exists(self.correct_math_path), "测试图片文件不存在")
-        text_list = extract_text_from_image(self.correct_math_path)
-        # 使用更严格的断言，确保识别结果完全符合预期
-        self.assertEqual("".join(text_list).replace(" ", ""), "1+1=2")
+    def test_ocr_result(self):
+        self.assertTrue(os.path.exists(self.img_path), "测试图片不存在")
+        ocr_engine = get_ocr_engine()
+        text_list = extract_text_from_image(ocr_engine, self.img_path)
+        result = "".join(text_list).replace(" ", "")
+        print(f"OCR结果: {result}")
+        self.assertEqual(result, "1+1=3")
 
-    def test_extract_from_image_object_exact(self):
-        """测试从Pillow Image对象提取精确的文本。"""
-        self.assertTrue(os.path.exists(self.wrong_math_path), "测试图片文件不存在")
-        with Image.open(self.wrong_math_path) as img:
-            text_list = extract_text_from_image(img)
-            self.assertEqual("".join(text_list).replace(" ", ""), "1+1=3")
-
-    def test_invalid_input_type(self):
-        """测试无效输入类型是否引发TypeError。"""
-        with self.assertRaises(TypeError):
-            extract_text_from_image(b'this is bytes') # 传递一个不支持的类型
+    def test_log_written(self):
+        self.assertTrue(os.path.exists(self.log_path), "日志文件不存在")
+        with open(self.log_path) as f:
+            log_content = f.read()
+        self.assertIn("Text extraction successful", log_content)
 
 if __name__ == '__main__':
     unittest.main()

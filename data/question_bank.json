@@ -17,5 +17,24 @@
         "known_p_hashes": [
             "aa2bd5d43895363a"
         ]
+    },
+    "d66b955be288e70a1ecaf87eb61aa60995f02e321fe230c5cadbdda3e5ca861d": {
+        "question_id": "d66b955be288e70a1ecaf87eb61aa60995f02e321fe230c5cadbdda3e5ca861d",
+        "canonical_text": "1+1=3",
+        "first_submission_image": "data/submissions/student_01/b6102c47ebd5.png",
+        "subject": "数学",
+        "master_analysis": {
+            "subject": "数学",
+            "is_correct": false,
+            "error_analysis": "计算错误。这道题的计算结果是错误的，1加1的正确结果应该是2，而不是3。",
+            "correct_answer": "1 + 1 = 2",
+            "solution_steps": "这是一个基础的加法运算。将数字1和另一个数字1相加，根据基础加法原则，得到最终结果2。",
+            "knowledge_point": "5以内的加法",
+            "common_mistakes": "在初学加法时，学生可能会因为数数不准确或者对加法概念理解不清晰而犯错。反复练习是关键。"
+        },
+        "first_seen_timestamp": "2025-07-16T12:47:26.655219",
+        "known_p_hashes": [
+            "ebc3953c7c830f11"
+        ]
     }
 }

@@ -1,27 +1,28 @@
-from paddleocr import PaddleOCR
+# ocr/paddle_ocr.py
+
 from PIL import Image
 import numpy as np
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("studyhelper_app")
 
-# 初始化OCR引擎，针对简单数学表达式优化参数
-# 禁用文档预处理功能，避免不必要的旋转和变形
-logger.info("Initializing PaddleOCR engine with optimized parameters...")
-ocr_engine = PaddleOCR(
-    lang='en',  # 使用英文模型，对数字和符号识别更好
-    use_doc_orientation_classify=False,  # 禁用文档方向分类
-    use_doc_unwarping=False,  # 禁用文档矫正
-    use_textline_orientation=False,  # 禁用文本行方向分类
-    text_det_limit_side_len=64,  # 设置检测限制
-    text_det_limit_type='min'  # 最小边限制
-)
-logger.info("PaddleOCR engine initialized with optimized parameters.")
-
-def extract_text_from_image(image_input):
-    """从图片中提取文本，支持文件路径或Pillow Image对象。"""
-    logger.info("Starting text extraction.")
+def extract_text_from_image(ocr_engine, image_input):
+    """
+    Uses a pre-initialized PaddleOCR engine to extract text from an image.
     
+    Args:
+        ocr_engine: An initialized instance of the PaddleOCR class.
+        image_input: A file path (str) or a Pillow Image object.
+
+    Returns:
+        A list of extracted text strings.
+    """
+    logger.info("Starting text extraction using the provided OCR engine.")
+    
+    if not ocr_engine:
+        logger.error("OCR engine is not available.")
+        return ["OCR服务异常"]
+
     try:
         img_for_ocr = None
         if isinstance(image_input, str):
@@ -33,23 +34,23 @@ def extract_text_from_image(image_input):
         else:
             raise TypeError("输入必须是文件路径 (str) 或 Pillow Image 对象")
 
-        logger.debug("Calling ocr_engine.ocr()...")
-        # 使用最简单的API调用，移除所有可能引起冲突的参数
+        logger.info("Calling ocr_engine.ocr()...")
         result = ocr_engine.ocr(img_for_ocr)
-        logger.debug("ocr_engine.ocr() returned.")
+        logger.info(f"Raw OCR Result: {result}")
+        print(f"PaddleOCR原始返回: {result}")
         
         extracted_text = []
-        if result and len(result) > 0:
-            # 新版本PaddleOCR的结果结构不同
-            for page_result in result:
-                if 'rec_texts' in page_result:
-                    # 直接获取识别到的文本列表
-                    page_texts = page_result['rec_texts']
-                    extracted_text.extend(page_texts)
-                    logger.info(f"Found texts: {page_texts}")
+        # 新版PaddleOCR返回dict，优先用rec_texts
+        if result and result[0] is not None:
+            if isinstance(result[0], dict) and 'rec_texts' in result[0]:
+                txts = result[0]['rec_texts']
+            else:
+                # 兼容旧格式
+                txts = [line[1][0] for line in result[0]]
+            extracted_text.extend(txts)
         
         if not extracted_text:
-            logger.warning("No text detected.")
+            logger.warning("No text detected in the image.")
             return ["识别失败"]
 
         logger.info(f"Text extraction successful: {extracted_text}")

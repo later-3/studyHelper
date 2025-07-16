@@ -1,0 +1,27 @@
+# docker-compose.yml for StudyHelper
+# This file simplifies the management of our Docker container.
+
+services:
+  app:
+    # Build the container using the Dockerfile in the current directory.
+    build: .
+    # Name the container for easy identification.
+    container_name: studyhelper_app
+    # Add environment variables for proxy settings
+    # Use host.docker.internal to refer to the host machine from within the container
+    # environment:
+      # - HTTP_PROXY=http://host.docker.internal:7890
+      # - HTTPS_PROXY=http://host.docker.internal:7890
+      # - NO_PROXY=localhost,127.0.0.1
+    # Map port 8501 from the container to port 8501 on the host machine.
+    # This allows you to access the Streamlit app from your browser at http://localhost:8501
+    ports:
+      - "8501:8501"
+    # Mount the current directory on the host to /app in the container.
+    # This creates a live-sync: any changes you make to the code on your Mac
+    # will be immediately reflected inside the container, without needing to rebuild.
+    volumes:
+      - .:/app
+    # Keep the container running, which is useful for development.
+    stdin_open: true
+    tty: true

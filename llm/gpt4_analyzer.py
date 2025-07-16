@@ -39,35 +39,57 @@ client = OpenAI(
 
 def analyze_question_with_gpt4(question_text: str) -> str:
     prompt = f"""
-你是一位顶级的AI老师，你的任务是分析学生提交的题目。请遵循以下步骤和要求：
+你是一位顶级的AI老师，你的任务是分析学生提交的题目并严格以JSON格式返回结果。
 
-1.  **审题**: 仔细阅读题目内容。
-2.  **判断学科**: 判断题目属于哪个学科（例如：数学、语文、英语等）。
-3.  **判断对错**: 判断题目中的计算或解答是否正确。
-4.  **深入分析**: 
-    - 如果题目是 **错误** 的，请明确指出错误所在，解释错误原因，并给出正确的答案和详细的解题步骤。
-    - 如果题目是 **正确** 的，请表扬学生，并可以提供另一种解法或相关的知识点扩展。
-5.  **总结知识点**: 总结这道题所考察的核心知识点。
-6.  **指出易错点**: 提醒学生在这类问题中常见的错误或需要注意的地方。
+**核心指令:** 无论任何情况，你的最终输出**必须**是一个完整的、无任何多余修饰的JSON代码块。
 
-**输出格式要求**:
-请严格按照以下JSON格式返回你的分析结果，不要添加任何额外的解释或说明文字。所有字段都必须包含，如果某个字段不适用，请返回空字符串 ""。
+---
+**示例 1: 一个错误的数学题**
 
+**输入:**
+```
+1 + 1 = 3
+```
+
+**你的输出:**
 ```json
 {{
   "subject": "数学",
-  "is_correct": false, 
-  "error_analysis": "计算错误。1加1的结果应该是2，而不是3。",
+  "is_correct": false,
+  "error_analysis": "计算错误。这道题的计算结果是错误的，1加1的正确结果应该是2，而不是3。",
   "correct_answer": "1 + 1 = 2",
-  "solution_steps": "这是一个基础的加法运算。将1和1相加，得到结果2。",
-  "knowledge_point": "10以内的加法",
-  "common_mistakes": "在初学加法时，可能会因为数数不准或对加法概念理解不清而出错。"
+  "solution_steps": "这是一个基础的加法运算。将数字1和另一个数字1相加，根据基础加法原则，得到最终结果2。",
+  "knowledge_point": "5以内的加法",
+  "common_mistakes": "在初学加法时，学生可能会因为数数不准确或者对加法概念理解不清晰而犯错。反复练习是关键。"
+}}
+```
+
+---
+**示例 2: 一个正确的地理题**
+
+**输入:**
+```
+中国的首都是北京
+```
+
+**你的输出:**
+```json
+{{
+  "subject": "地理",
+  "is_correct": true,
+  "error_analysis": "",
+  "correct_answer": "中国的首都是北京。",
+  "solution_steps": "这是一个关于国家首都的基本常识题。中国的首都确实是北京。",
+  "knowledge_point": "世界各国首都",
+  "common_mistakes": "对于中国地理不熟悉的学生，可能会将上海等经济中心误认为是首都。"
 }}
 ```
 
 ---
 
-**现在，请分析以下题目：**
+**任务开始**
+
+现在，请严格遵循以上示例的格式，分析以下题目。不要添加任何额外的解释、对话或说明文字，直接输出JSON代码块。
 
 **题目内容:**
 ```
@@ -78,10 +100,10 @@ def analyze_question_with_gpt4(question_text: str) -> str:
     response = client.chat.completions.create(
         model="deepseek-chat",
         messages=[
-            {"role": "system", "content": "你是一位顶级的AI数学老师，你的任务是分析学生提交的数学题目，并严格按照要求的JSON格式输出。"},
+            {"role": "system", "content": "你是一位顶级的AI分析专家，你的任务是分析题目，并严格按照用户要求的JSON格式输出，不得包含任何额外文本。"},
             {"role": "user", "content": prompt}
         ],
-        temperature=0.2, # 降低随机性以保证格式稳定
-        max_tokens=1000
+        temperature=0.1, # 进一步降低随机性
+        max_tokens=1500  # 稍微增加token以容纳更复杂的分析
     )
     return response.choices[0].message.content.strip() if response.choices[0].message.content else ""
