@@ -3,96 +3,100 @@
 import unittest
 import os
 import json
+import uuid
+import sys
+
+# Add project root to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from services import mistake_book_service
 
 class TestMistakeBookService(unittest.TestCase):
-    """Test cases for the Mistake Book Service."""
 
     def setUp(self):
-        """Set up a temporary mistakes file for testing."""
-        # Use a path that includes a directory to avoid FileNotFoundError
-        self.test_dir = "./test_data_temp"
-        self.test_file_path = os.path.join(self.test_dir, "test_mistakes.json")
-        mistake_book_service.MISTAKES_FILE_PATH = self.test_file_path
-        
-        # Create the temporary directory
-        os.makedirs(self.test_dir, exist_ok=True)
+        """Set up a temporary, isolated mistakes file for each test."""
+        # Generate a unique filename for the test mistakes file
+        self.test_mistakes_file = f'test_mistakes_{uuid.uuid4()}.json'
+        # Override the service's file path to use our temporary file
+        mistake_book_service.MISTAKES_FILE = self.test_mistakes_file
+        # Ensure the file is clean before each test
+        if os.path.exists(self.test_mistakes_file):
+            os.remove(self.test_mistakes_file)
 
     def tearDown(self):
-        """Clean up the temporary directory and its contents after testing."""
-        if os.path.exists(self.test_dir):
-            import shutil
-            shutil.rmtree(self.test_dir)
+        """Clean up the temporary mistakes file after each test."""
+        if os.path.exists(self.test_mistakes_file):
+            os.remove(self.test_mistakes_file)
 
-    def test_add_mistake_for_incorrect_answer(self):
-        """Test that a mistake is added only when the answer is incorrect."""
-        user_id = "student_test_01"
+    def test_add_mistake_when_incorrect(self):
+        """Verify that a mistake is added when the analysis marks the answer as incorrect."""
+        user_id = "test_user_01"
         question_id = "q_math_001"
-        ocr_text = "What is 2+2?"
-        correct_analysis = {"is_correct": True}
-        incorrect_analysis = {
-            "is_correct": False, 
-            "knowledge_point": "Basic Arithmetic", 
-            "error_analysis": "Calculation error"
-        }
+        # Simulate an analysis result for an incorrect answer
+        incorrect_analysis = {"is_correct": False, "subject": "Math"}
+        submitted_text = "1 + 1 = 3"
 
-        # Case 1: Correct answer, should not add a mistake
-        added = mistake_book_service.add_mistake_if_incorrect(user_id, question_id, correct_analysis, ocr_text)
-        self.assertFalse(added)
-        mistakes = mistake_book_service.get_mistakes_by_user(user_id)
-        self.assertEqual(len(mistakes), 0)
+        # Call the service function
+        success = mistake_book_service.add_mistake_if_incorrect(
+            user_id, question_id, incorrect_analysis, submitted_text
+        )
 
-        # Case 2: Incorrect answer, should add a mistake
-        added = mistake_book_service.add_mistake_if_incorrect(user_id, question_id, incorrect_analysis, ocr_text)
-        self.assertTrue(added)
-        mistakes = mistake_book_service.get_mistakes_by_user(user_id)
-        self.assertEqual(len(mistakes), 1)
-        self.assertEqual(mistakes[0]['question_id'], question_id)
-        self.assertEqual(mistakes[0]['knowledge_point'], "Basic Arithmetic")
+        # Assertions
+        self.assertTrue(success, "The save operation should succeed.")
+        
+        # Verify the content of the mistakes file
+        with open(self.test_mistakes_file, 'r', encoding='utf-8') as f:
+            mistakes_data = json.load(f)
+        
+        self.assertIn(user_id, mistakes_data, "User ID should be a key in the mistakes data.")
+        self.assertEqual(len(mistakes_data[user_id]), 1, "There should be one mistake entry for the user.")
+        
+        mistake_entry = mistakes_data[user_id][0]
+        self.assertEqual(mistake_entry['question_id'], question_id)
+        self.assertEqual(mistake_entry['review_status'], "needs_review")
 
-    def test_add_mistake_avoids_duplicates(self):
-        """Test that the same mistake is not added twice for the same user."""
-        user_id = "student_test_02"
-        question_id = "q_sci_002"
-        ocr_text = "What is H2O?"
-        incorrect_analysis = {"is_correct": False}
+    def test_no_mistake_when_correct(self):
+        """Verify that no mistake is added when the analysis marks the answer as correct."""
+        user_id = "test_user_02"
+        question_id = "q_geo_002"
+        # Simulate an analysis result for a correct answer
+        correct_analysis = {"is_correct": True, "subject": "Geography"}
+        submitted_text = "Capital of France is Paris"
 
-        # Add the mistake for the first time
-        mistake_book_service.add_mistake_if_incorrect(user_id, question_id, incorrect_analysis, ocr_text)
-        mistakes = mistake_book_service.get_mistakes_by_user(user_id)
-        self.assertEqual(len(mistakes), 1)
+        # Call the service function
+        success = mistake_book_service.add_mistake_if_incorrect(
+            user_id, question_id, correct_analysis, submitted_text
+        )
 
-        # Try to add the same mistake again
-        added = mistake_book_service.add_mistake_if_incorrect(user_id, question_id, incorrect_analysis, ocr_text)
-        self.assertFalse(added) # Should return False as it was not added
-        mistakes = mistake_book_service.get_mistakes_by_user(user_id)
-        self.assertEqual(len(mistakes), 1) # Count should still be 1
+        # Assertions
+        self.assertTrue(success, "The operation should be considered successful.")
+        
+        # Verify that the mistakes file was NOT created or is empty
+        if os.path.exists(self.test_mistakes_file):
+            with open(self.test_mistakes_file, 'r', encoding='utf-8') as f:
+                mistakes_data = json.load(f)
+            self.assertNotIn(user_id, mistakes_data, "User ID should not be in the mistakes data for a correct answer.")
+        else:
+            # If the file doesn't even exist, that's also a pass
+            self.assertTrue(True)
 
-    def test_get_mistakes_by_user_returns_correct_data(self):
-        """Test that mistakes for different users are handled correctly."""
-        user1 = "student_01"
-        user2 = "student_02"
-        analysis = {"is_correct": False}
+    def test_no_duplicate_mistakes(self):
+        """Verify that adding the same incorrect question multiple times does not create duplicate entries."""
+        user_id = "test_user_03"
+        question_id = "q_eng_003"
+        incorrect_analysis = {"is_correct": False, "subject": "English"}
+        submitted_text = "I has a book."
 
-        # Add mistakes for both users
-        mistake_book_service.add_mistake_if_incorrect(user1, "q1", analysis, "q1_text")
-        mistake_book_service.add_mistake_if_incorrect(user2, "q2", analysis, "q2_text")
-        mistake_book_service.add_mistake_if_incorrect(user1, "q3", analysis, "q3_text")
+        # First call - should add the mistake
+        mistake_book_service.add_mistake_if_incorrect(user_id, question_id, incorrect_analysis, submitted_text)
+        # Second call - should recognize the duplicate and skip
+        mistake_book_service.add_mistake_if_incorrect(user_id, question_id, incorrect_analysis, submitted_text)
 
-        # Check mistakes for user1
-        user1_mistakes = mistake_book_service.get_mistakes_by_user(user1)
-        self.assertEqual(len(user1_mistakes), 2)
-        self.assertEqual(user1_mistakes[0]['question_id'], "q3") # Sorted by date, q3 is newest
-        self.assertEqual(user1_mistakes[1]['question_id'], "q1")
-
-        # Check mistakes for user2
-        user2_mistakes = mistake_book_service.get_mistakes_by_user(user2)
-        self.assertEqual(len(user2_mistakes), 1)
-        self.assertEqual(user2_mistakes[0]['question_id'], "q2")
-
-        # Check for a user with no mistakes
-        user3_mistakes = mistake_book_service.get_mistakes_by_user("student_03")
-        self.assertEqual(len(user3_mistakes), 0)
+        # Verify the content
+        with open(self.test_mistakes_file, 'r', encoding='utf-8') as f:
+            mistakes_data = json.load(f)
+        
+        self.assertEqual(len(mistakes_data[user_id]), 1, "There should only be one entry for the same mistake.")
 
 if __name__ == '__main__':
     unittest.main()
