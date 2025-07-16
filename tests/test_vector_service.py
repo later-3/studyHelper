@@ -1,116 +1,72 @@
-# -*- coding: utf-8 -*-
-"""
-Unit Tests for the Vector Service
-
-This test suite ensures that the VectorService class functions correctly,
-including document addition, searching, and management.
-It uses a temporary directory for the ChromaDB instance to avoid
-interfering with any development data.
-"""
+# tests/test_vector_service.py
 
 import unittest
-import shutil
 import os
-from services.vector_service import VectorService
+import shutil
+import uuid
+import sys
+
+# Add project root to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from services import vector_service
 
 class TestVectorService(unittest.TestCase):
-    """Test cases for the VectorService."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Set up a temporary directory for the test database."""
-        cls.test_db_path = "./test_chroma_db_temp"
-        # Ensure the directory does not exist before starting
-        if os.path.exists(cls.test_db_path):
-            shutil.rmtree(cls.test_db_path)
-        os.makedirs(cls.test_db_path)
-        cls.vector_service = VectorService(db_path=cls.test_db_path)
-
-    @classmethod
-    def tearDownClass(cls):
-        """Clean up the temporary database directory after all tests."""
-        if os.path.exists(cls.test_db_path):
-            shutil.rmtree(cls.test_db_path)
 
     def setUp(self):
-        """Clear the collection before each test to ensure isolation."""
-        self.vector_service.clear_all_documents()
-        self.populate_test_data()
-
-    def populate_test_data(self):
-        """Populate the collection with some sample data."""
-        self.ids = ["q1", "q2", "q3", "q4"]
-        self.documents = [
-            "What is the formula for the area of a circle?",
-            "How do you calculate the circumference of a circle?",
-            "What is the Pythagorean theorem?",
-            "Explain the concept of photosynthesis."
-        ]
-        self.metadatas = [
-            {"subject": "Math", "topic": "Geometry"},
-            {"subject": "Math", "topic": "Geometry"},
-            {"subject": "Math", "topic": "Geometry"},
-            {"subject": "Science", "topic": "Biology"}
-        ]
-        self.vector_service.add_documents(self.ids, self.documents, self.metadatas)
-
-    def test_add_documents_successfully(self):
-        """Test that documents can be added and retrieved."""
-        retrieved = self.vector_service.get_document_by_id("q1")
-        self.assertIn("q1", retrieved['ids'])
-        self.assertEqual(retrieved['documents'][0], self.documents[0])
-        self.assertEqual(retrieved['metadatas'][0]['subject'], "Math")
-
-    def test_add_documents_mismatched_lengths_raises_error(self):
-        """Test that adding documents with mismatched list lengths raises a ValueError."""
-        with self.assertRaises(ValueError):
-            self.vector_service.add_documents(
-                ids=["id5"],
-                documents=["doc5", "doc6"],
-                metadatas=[{"data": "meta5"}]
-            )
-
-    def test_search_similar_finds_relevant_documents(self):
-        """Test that similarity search returns the most relevant documents."""
-        query = "questions about circles"
-        results = self.vector_service.search_similar(query, top_n=2)
+        """Set up a temporary, isolated ChromaDB for each test."""
+        # Create a unique directory for the test database
+        self.test_db_path = f'test_chroma_db_{uuid.uuid4()}'
+        os.makedirs(self.test_db_path, exist_ok=True)
         
-        # The top 2 results should be q1 and q2
-        result_ids = results['ids'][0]
-        self.assertEqual(len(result_ids), 2)
-        self.assertIn("q1", result_ids)
-        self.assertIn("q2", result_ids)
-        self.assertNotIn("q4", result_ids)
+        # Override the service's client to use our temporary, in-memory database path
+        vector_service.client = vector_service.chromadb.PersistentClient(path=self.test_db_path)
+        self.collection_name = f"test_collection_{uuid.uuid4().hex}"
 
-    def test_search_with_metadata_filter(self):
-        """Although not explicitly in the service, ChromaDB supports it. This is a placeholder for future extension."""
-        # This test demonstrates how a filter *would* be used, preparing for future features.
-        results = self.vector_service.collection.query(
-            query_texts=["What are geometric concepts?"],
-            n_results=3,
-            where={"subject": "Math"}
-        )
-        result_ids = results['ids'][0]
-        self.assertIn("q1", result_ids)
-        self.assertIn("q2", result_ids)
-        self.assertIn("q3", result_ids)
-        self.assertEqual(len(result_ids), 3)
+    def tearDown(self):
+        """Clean up the temporary database directory after each test."""
+        if os.path.exists(self.test_db_path):
+            shutil.rmtree(self.test_db_path)
 
-    def test_clear_all_documents(self):
-        """Test that the collection can be completely cleared."""
-        # Verify there is data first
-        count_before = self.vector_service.collection.count()
-        self.assertEqual(count_before, 4)
+    def test_01_get_or_create_collection(self):
+        """Test that a collection can be successfully created."""
+        collection = vector_service.get_or_create_collection(self.collection_name)
+        self.assertIsNotNone(collection, "Collection should be created.")
+        self.assertEqual(collection.name, self.collection_name)
 
-        # Clear and verify
-        self.vector_service.clear_all_documents()
-        count_after = self.vector_service.collection.count()
-        self.assertEqual(count_after, 0)
+    def test_02_add_document(self):
+        """Test that a document can be added to a collection."""
+        collection = vector_service.get_or_create_collection(self.collection_name)
+        doc_id = "doc1"
+        document = "What is the capital of France?"
+        metadata = {"subject": "Geography"}
 
-    def test_get_non_existent_document(self):
-        """Test that getting a non-existent document returns an empty list."""
-        result = self.vector_service.get_document_by_id("non_existent_id")
-        self.assertEqual(len(result['ids']), 0)
+        success = vector_service.add_document(collection, document, metadata, doc_id)
+        self.assertTrue(success, "Document should be added successfully.")
+
+        # Verify the document was added
+        retrieved = collection.get(ids=[doc_id])
+        self.assertEqual(len(retrieved['ids']), 1)
+        self.assertEqual(retrieved['documents'][0], document)
+        self.assertEqual(retrieved['metadatas'][0]['subject'], "Geography")
+
+    def test_03_find_similar_documents(self):
+        """Test that similarity search returns relevant results."""
+        collection = vector_service.get_or_create_collection(self.collection_name)
+        
+        # Add some documents
+        vector_service.add_document(collection, "The Eiffel Tower is in Paris.", {"topic": "monuments"}, "doc1")
+        vector_service.add_document(collection, "The primary colors are red, yellow, and blue.", {"topic": "art"}, "doc2")
+        vector_service.add_document(collection, "Paris is the capital of France.", {"topic": "capitals"}, "doc3")
+
+        # Query for a similar document
+        query_text = "Which city is the French capital?"
+        results = vector_service.find_similar_documents(collection, query_text, n_results=1)
+        
+        # The most similar document should be doc3
+        self.assertIsNotNone(results)
+        self.assertEqual(len(results['ids'][0]), 1)
+        self.assertEqual(results['ids'][0][0], "doc3", "The most similar document should be about Paris being the capital.")
 
 if __name__ == '__main__':
     unittest.main()
